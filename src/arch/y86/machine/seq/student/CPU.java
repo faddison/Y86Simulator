@@ -45,10 +45,20 @@ public class CPU extends AbstractY86CPU.Sequential {
 			case I_PUSHL:
 			case I_POPL:
 			case I_CALL:
+				switch (var = f.iFn.getValueProduced()) {
+				case 0x0:
+					f.stat.set (S_AOK);
+					break;
+				default:
+					f.stat.set (S_INS);
+					break;
+				}
+				break;
 			case I_RMMOVL:
 			case I_MRMOVL:
-				switch (f.iFn.getValueProduced()) {
+				switch (var = f.iFn.getValueProduced()) {
 				case 0x0:
+				case 0x4:
 					f.stat.set (S_AOK);
 					break;
 				default:
@@ -94,10 +104,10 @@ public class CPU extends AbstractY86CPU.Sequential {
 				break;
 			}
 
-			if (f.stat.getValueProduced()==S_AOK) {
+			if (f.stat.getValueProduced()==S_AOK) { 
 
 				// rA MUX
-				switch (f.iCd.getValueProduced()) {
+				switch (var = f.iCd.getValueProduced() + 0) {
 				case I_HALT:
 					f.rA.set   (R_NONE);
 					f.stat.set (S_HLT);
@@ -128,7 +138,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 				case I_RMMOVL:
 					f.rB.set(mem.read(F.pc.get() + 1,1)[0].value() & 0xf);
 					break;
-				case I_MRMOVL:
+				case I_MRMOVL: // this is where we alter the offset
 					f.rB.set(mem.read(F.pc.get() + 1,1)[0].value() & 0xf);
 					break;
 				case I_OPL:
@@ -321,7 +331,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	// why no valE? is it meant to be in aluB and aluA?
 
 	@Override protected void execute () throws Register.TimingException {
-
+		int var;
 		// pass-through signals
 		e.stat.set (E.stat.get());
 		e.iCd.set  (E.iCd.get());
@@ -368,6 +378,15 @@ public class CPU extends AbstractY86CPU.Sequential {
 				break;
 			case I_RMMOVL:
 			case I_MRMOVL:
+				switch (var = e.iFn.getValueProduced()) {
+				case 0x4:
+					aluB = E.valB.get() * 4;
+					break;
+				default:
+					aluB = E.valB.get();
+					break;
+				}
+				break;
 			case I_OPL:
 			case I_CALL:
 			case I_RET:
