@@ -7,6 +7,8 @@ import arch.y86.machine.AbstractY86CPU;
 
 public class CPU extends AbstractY86CPU.Sequential {
 
+	int debug;
+	
   public CPU (String name, AbstractMainMemory memory) {
     super (name, memory);
   }
@@ -36,7 +38,7 @@ public class CPU extends AbstractY86CPU.Sequential {
       f.iFn.set (mem.read (F.pc.get(),1)[0].value() & 0xf);
 
       // stat MUX
-      switch (f.iCd.getValueProduced()) {
+      switch (debug = f.iCd.getValueProduced()) {
       case I_HALT:
       case I_NOP:
       case I_IRMOVL:
@@ -44,6 +46,7 @@ public class CPU extends AbstractY86CPU.Sequential {
       case I_PUSHL:
       case I_POPL:
       case I_CALL:
+      case I_CALLI:
     	  switch (f.iFn.getValueProduced()) {
     		case 0x0:
     		  f.stat.set (S_AOK);
@@ -166,6 +169,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	case I_OPL:
 	case I_PUSHL:
 	case I_POPL:
+	case I_CALLI:
 	  f.valP.set (F.pc.get()+2);
 	  break;
 	case I_JXX:
@@ -211,6 +215,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	case I_OPL:
 	case I_IOPL:
 	case I_PUSHL:
+	case I_CALLI:
 	  d.srcA.set (D.rA.get());
 	  break;
 	case I_RET:
@@ -233,6 +238,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	case I_RET:
 	case I_PUSHL:
 	case I_POPL:
+	case I_CALLI:
 	  d.srcB.set (R_ESP);
 	  break;
 	default:
@@ -251,6 +257,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	case I_RET:
 	case I_PUSHL:
 	case I_POPL:
+	case I_CALLI:
 	  d.dstE.set (R_ESP);
 	  break;
 	default:
@@ -334,6 +341,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	aluA = 4;
 	break;
       case I_CALL:
+      case I_CALLI:
       case I_PUSHL:
 	aluA = -4;
 	break;
@@ -362,6 +370,7 @@ public class CPU extends AbstractY86CPU.Sequential {
       case I_OPL:
       case I_IOPL:
       case I_CALL:
+      case I_CALLI:
       case I_RET:
       case I_PUSHL:
       case I_POPL:
@@ -380,6 +389,7 @@ public class CPU extends AbstractY86CPU.Sequential {
       case I_RMMOVL:
       case I_MRMOVL:
       case I_CALL:
+      case I_CALLI:
       case I_RET:
       case I_PUSHL:
       case I_POPL:
@@ -504,6 +514,7 @@ public class CPU extends AbstractY86CPU.Sequential {
 	switch (M.iCd.get()) {
 	case I_RMMOVL:
 	case I_PUSHL:
+	case I_CALLI:
 	  mem.writeInteger (M.valE.get(), M.valA.get());
 	  break;
 	case I_CALL:
@@ -588,6 +599,9 @@ public class CPU extends AbstractY86CPU.Sequential {
     case I_CALL:
       w.pc.set (E.valC.get());
       break;
+    case I_CALLI:
+        w.pc.set (E.valA.get());
+        break;
     case I_JXX:
       if (M.cnd.get()==1)
 	w.pc.set (E.valC.get());
