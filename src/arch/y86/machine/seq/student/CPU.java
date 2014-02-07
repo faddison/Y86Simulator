@@ -44,17 +44,27 @@ public class CPU extends AbstractY86CPU.Sequential {
       case I_PUSHL:
       case I_POPL:
       case I_CALL:
+    	  switch (f.iFn.getValueProduced()) {
+    		case 0x0:
+    		  f.stat.set (S_AOK);
+    		  break;
+    		default:
+    		  f.stat.set (S_INS);
+    		  break;
+    		}
+    	  break;
       case I_RMMOVL:
       case I_MRMOVL:
-	switch (f.iFn.getValueProduced()) {
-	case 0x0:
-	  f.stat.set (S_AOK);
-	  break;
-	default:
-	  f.stat.set (S_INS);
-	  break;
-	}
-	break;
+		switch (f.iFn.getValueProduced()) {
+		case 0x0:
+		case 0x4:
+		  f.stat.set (S_AOK);
+		  break;
+		default:
+		  f.stat.set (S_INS);
+		  break;
+		}
+		break;
       case I_RRMVXX:
       case I_JXX:
 	switch (f.iFn.getValueProduced()) {
@@ -331,13 +341,22 @@ public class CPU extends AbstractY86CPU.Sequential {
 	break;
       case I_RMMOVL:
       case I_MRMOVL:
+    	  switch (e.iFn.getValueProduced()) {
+    		case 0x4:
+    			aluB = E.valB.get() * 4;
+    		  break;
+    		default:
+    			aluB = E.valB.get();
+    		  break;
+    		}
+    	  break;
       case I_OPL:
       case I_CALL:
       case I_RET:
       case I_PUSHL:
       case I_POPL:
-	aluB = E.valB.get();
-	break;
+    	  aluB = E.valB.get();
+	  break;
       default:
 	aluB = 0;
       }
