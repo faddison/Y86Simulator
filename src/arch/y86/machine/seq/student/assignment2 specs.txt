@@ -1,0 +1,168 @@
+rmmovl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valA <- R[rA]
+valB <- R[rB]
+
+EXECUTE
+valE <- 4 * valB + valC
+
+MEMORY
+M4[valE] <- valA
+valM
+
+WRITEBACK
+
+PCU
+PC <- valP
+
+
+
+
+mrmovl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valB <- R[rB]
+
+EXECUTE
+valE <- 4 * valB + valC
+
+MEMORY
+valM <- M4[valE]
+
+WRITEBACK
+R[rA] <- valM
+
+PCU
+PC <- valP
+
+
+
+
+iaddl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valB <- R[rB]
+
+EXECUTE
+valE <- valB + valC 
+
+MEMORY
+
+WRITEBACK
+R[rB] <- valE
+
+PCU
+PC <-valP
+
+
+
+
+isubl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valB <- R[rB]
+
+EXECUTE
+valE <- valB - valC 
+
+MEMORY
+
+WRITEBACK
+R[rB] <- valE
+
+PCU
+PC <-valP
+
+
+
+
+ixorl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valB <- R[rB]
+
+EXECUTE
+valE <- valB XOR valC 
+
+MEMORY
+
+WRITEBACK
+R[rB] <- valE
+
+PCU
+PC <-valP
+
+
+
+
+iandl
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valC <- M4[PC + 2]
+valP <- PC + 6
+
+DECODE
+valB <- R[rB]
+
+EXECUTE
+valE <- valB AND valC 
+
+MEMORY
+
+WRITEBACK
+R[rB] <- valE
+
+PCU
+PC <-valP
+
+
+
+
+call
+FETCH
+iCode: iFun <- M1[PC]
+rA:rB <- M1[PC + 1]
+valP <- PC + 2
+
+DECODE
+valA <- R[rA]
+valB <- R[%esp]
+
+EXECUTE
+valE <- valB - 4
+
+MEMORY
+M4[valE] <- valP
+
+WRITEBACK
+R[%esp] <- valE
+
+PCU
+PC <- valA
